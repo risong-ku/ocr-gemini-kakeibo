@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}集計 — kakeibo{% endblock %}
+{% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js" defer></script>
+  <script src="/static/dashboard.js" defer></script>
+{% endblock %}
+{% block content %}
+  <header class="page-header"><h1>集計</h1><nav><a href="/">＋ 登録へ</a></nav></header>
+  <div class="month-switch">
+    <button id="previous-month" type="button" aria-label="前月">◀</button>
+    <output id="month" aria-live="polite"></output>
+    <button id="next-month" type="button" aria-label="翌月">▶</button>
+  </div>
+  <p id="dashboard-status" role="status"></p>
+  <button id="retry-summary" type="button" hidden>再読み込み</button>
+  <div id="summary-content" hidden>
+    <div class="total-cards">
+      <section class="total-card child-card"><h2>子ども費</h2><output id="child-total">0円</output></section>
+      <section class="total-card couple-card"><h2>夫婦生活費</h2><output id="couple-total">0円</output></section>
+    </div>
+    <div class="chart-container"><canvas id="daily-chart" aria-label="日次支出グラフ（子ども費・夫婦生活費）" role="img"></canvas></div>
+    <p id="chart-status" role="status" hidden>グラフを読み込めませんでした。</p>
+    <a id="export-month" class="button full-width" href="/export.csv?month=all">CSVダウンロード（この月）</a>
+    <a id="export-all" class="secondary-link" href="/export.csv?month=all">CSVダウンロード（全期間）</a>
+    <h2>レシート一覧</h2>
+    <section id="receipts" aria-label="レシート一覧"></section>
+  </div>
+{% endblock %}

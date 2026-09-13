@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}kakeibo{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js" defer></script>
+  {% block scripts %}{% endblock %}
+</head>
+<body>
+  <main class="page">
+    {% block content %}{% endblock %}
+    <p id="session-expired" class="error" role="alert" hidden>セッションの有効期限が切れました。<a href="/login">ログインへ</a></p>
+    <noscript><p class="warning">レシートの登録・集計には JavaScript を有効にしてください。</p></noscript>
+  </main>
+</body>
+</html>

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}レシート登録 — kakeibo{% endblock %}
+{% block content %}
+  <header class="page-header"><h1>レシート登録</h1><nav><a href="/dashboard">📊 集計</a></nav></header>
+  <section id="upload-view">
+    <form id="upload-form" method="post" action="/api/receipts/parse" enctype="multipart/form-data">
+      <label for="file">📷 レシートを撮影 / 選択</label>
+      <div class="upload-actions">
+        <input id="file" name="file" type="file" accept="image/*" required>
+        <button id="manual-entry" type="button">手入力で登録</button>
+      </div>
+    </form>
+  </section>
+  <section id="parsing-view" role="status" tabindex="-1" hidden><span class="spinner" aria-hidden="true"></span>レシートを解析しています…</section>
+  <section id="confirmation-view" hidden>
+    <h2 id="confirmation-heading" tabindex="-1">内容の確認</h2>
+    <div id="warnings" class="warning" role="status" hidden></div>
+    <p id="total-warning" class="warning" role="status" hidden></p>
+    <p id="uncertain-count" class="warning" role="status" hidden></p>
+    <form id="confirmation-form" method="post" action="/api/receipts" enctype="multipart/form-data">
+      <fieldset id="confirmation-fields">
+        <label for="date">日付</label><input id="date" type="date" required>
+        <label for="store">店名</label><input id="store" type="text">
+        <label for="total">レシート合計（円）</label><input id="total" type="text" inputmode="numeric" pattern="-?[0-9]+" value="0" required>
+        <button type="button" class="sign-toggle" data-sign-target="total" aria-label="レシート合計の正負を切り替え">＋ / −</button>
+        <h3>品目</h3>
+        <button id="collapse-items" type="button">1行にまとめる</button>
+        <div id="items"></div>
+        <button id="add-item" type="button">＋ 行を追加</button>
+        <h3>小計（ライブ更新）</h3>
+        <div id="subtotals" aria-live="polite">
+          <p>子ども費 <output id="child-subtotal">0円</output></p>
+          <p>夫婦生活費 <output id="couple-subtotal">0円</output></p>
+          <p>対象外 <output id="excluded-subtotal">0円</output></p>
+          <p class="sum">合計 <output id="items-total">0円</output></p>
+        </div>
+        <button id="save" class="primary full-width" type="submit">保存する</button>
+        <button id="restart" type="button">やり直す</button>
+      </fieldset>
+    </form>
+  </section>
+  <p id="save-status" role="status"></p>
+  <template id="item-template">
+    <div class="item-row">
+      <div class="item-inputs">
+        <label class="item-name-label">品目名<input class="item-name" type="text"></label>
+        <label>金額（円）<input class="item-price" type="text" inputmode="numeric" pattern="-?[0-9]+" value="0" required></label>
+        <button class="delete-item" type="button" aria-label="この品目を削除">✕</button>
+      </div>
+      <div class="item-actions">
+        <div class="category-control" role="group" aria-label="カテゴリ">
+          <button type="button" data-category="child" aria-pressed="false">子</button>
+          <button type="button" data-category="couple" aria-pressed="true">夫婦</button>
+          <button type="button" data-category="excluded" aria-pressed="false">外</button>
+        </div>
+        <button type="button" class="toggle-price-sign" aria-label="品目金額の正負を切り替え">＋ / −</button>
+      </div>
+    </div>
+  </template>
+{% endblock %}

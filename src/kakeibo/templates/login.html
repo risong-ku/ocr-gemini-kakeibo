@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}ログイン — kakeibo{% endblock %}
+{% block content %}
+  <h1>kakeibo</h1>
+  <form id="login-form" method="post" action="/login">
+    <label for="passcode">パスコード</label>
+    <input id="passcode" name="passcode" type="password" autocomplete="current-password" required>
+    <button class="primary full-width" type="submit">ログイン</button>
+  </form>
+  {% if error %}<p id="login-error" class="error" role="alert">{{ error }}</p>{% endif %}
+{% endblock %}
