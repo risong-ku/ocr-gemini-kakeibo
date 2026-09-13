@@ -11,6 +11,19 @@ function discountCategoryWarnings(items) {
     });
 }
 
+// Mirrors services/gemini.py: the same rates and tolerance produce the same hint.
+const TAX_RATES = [1.1, 1.08];
+const TAX_TOLERANCE_YEN = 1;
+
+function taxHint(sum, total) {
+  for (const rate of TAX_RATES) {
+    if (Math.abs(Math.round(sum * rate) - total) <= TAX_TOLERANCE_YEN) {
+      return `（品目が税抜表示の可能性: ×${rate.toFixed(2)} で一致）`;
+    }
+  }
+  return "";
+}
+
 window.kakeiboUI = (() => {
   const yen = (value) => `${value.toLocaleString("ja-JP")}円`;
   const todayJst = () => {
@@ -86,7 +99,9 @@ window.kakeiboUI = (() => {
     byId("items-total").textContent = yen(sum);
     const total = integer(byId("total"));
     byId("total-warning").hidden = !valid || total === null || sum === total;
-    byId("total-warning").textContent = `品目合計 ${yen(sum)} がレシート合計 ${total === null ? "—" : yen(total)} と一致しません`;
+    byId("total-warning").textContent =
+      `品目合計 ${yen(sum)} がレシート合計 ${total === null ? "—" : yen(total)} と一致しません`
+      + (total === null ? "" : taxHint(sum, total));
     const warnings = byId("warnings");
     warnings.replaceChildren();
     for (const warning of [...serverWarnings, ...discountCategoryWarnings(currentItems)]) {
@@ -150,7 +165,11 @@ window.kakeiboUI = (() => {
     items.replaceChildren();
     for (const item of draft.items) addItem(item);
     if (!draft.items.length) addItem();
-    serverWarnings = draft.warnings || [];
+    // The items-sum mismatch is recomputed live (with the tax hint) by
+    // updateTotals, so drop the server copy instead of showing it twice.
+    serverWarnings = (draft.warnings || []).filter(
+      (warning) => !warning.startsWith("品目合計")
+    );
     updateTotals();
     showView("confirmation");
     byId("confirmation-heading").focus();

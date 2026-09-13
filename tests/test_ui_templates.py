@@ -204,6 +204,10 @@ def test_static_assets_are_public_without_configuration(asset: str) -> None:
         if asset == "app.js":
             assert "function discountCategoryWarnings(items)" in response.text
             assert "の品目がありません" in response.text
+            # The live items-sum warning carries the same tax hint as the server,
+            # and the duplicated server warning is filtered out on the client.
+            assert "税抜表示の可能性" in response.text
+            assert 'warning.startsWith("品目合計")' in response.text
         assert "location" not in response.headers
         assert (
             "javascript" in response.headers["content-type"]
